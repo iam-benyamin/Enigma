@@ -3,7 +3,7 @@ Reflector is responsible for mirror input charactor
 i.e. You give b to reflector and it's return z
 b is 2 word in english alphabet and z is 26 - 2
 """
-from main import ALPHABET
+from . import ALPHABET
 
 
 def reflector(char: str) -> str:

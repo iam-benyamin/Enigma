@@ -2,7 +2,7 @@
 
 from random import shuffle
 
-from main import ALPHABET
+from . import ALPHABET
 
 
 def rotor_generator(rotors_number: int = 5, text: str = "") -> str:

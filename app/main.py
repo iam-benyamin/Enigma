@@ -2,10 +2,10 @@
 
 import sys
 
-from string import ascii_lowercase
+from app import rotor
 
-
-ALPHABET = ascii_lowercase
+from .reflector import reflector
+from . import ALPHABET
 
 
 rotors: list[str] = []
@@ -35,6 +35,17 @@ def set_rotors(rotors: list[str], selected_rotors: list[int], shift: list[int]) 
     return rotors
 
 
+def rotate_rotors(shift_counter: int) -> None:
+    ''' Every time we encode a word, the first rotor shifts a word, every
+    26 times the second rotor shifts a word, and the third rotor finds a
+    shift word every 26 * 26 times. '''
+    rotors[0] = rotors[0][1:] + rotors[0][:1]
+    if shift_counter % 26:
+        rotors[1] = rotors[1][1:] + rotors[1][:1]
+    if shift_counter % 676:
+        rotors[2] = rotors[2][1:] + rotors[2][:1]
+
+
 with open('data/plain.txt', 'r', encoding='UTF-8') as plain_file:
     plain_txt = plain_file.read()
     del plain_file
@@ -61,9 +72,6 @@ def write_cipher(cipher_txt: str) -> None:
     with open('data/cipher.txt', 'w', encoding='UTF-8') as cipher:
         cipher.write(cipher_txt)
         del cipher
-
-
-write_cipher(cleand_plain_txt)
 
 
 def check_user_input_for_rotor(r: str, r_in_range, is_rotor: bool = False) -> list[int]:
@@ -121,5 +129,26 @@ except ValueError:
 
 rotors = set_rotors(rotors, rotors_number, rotors_shift)
 
-print('your cipher in \'data/cipher.txt\'')
-print('done!!')
+
+def code_plain_txt(char: str) -> str:
+    """ It takes a word from routers and reflectors """
+    c1 = rotors[0][ALPHABET.index(char)]
+    c2 = rotors[1][ALPHABET.index(c1)]
+    c3 = rotors[2][ALPHABET.index(c2)]
+    reflected = reflector(c3)
+    c3 = ALPHABET[rotors[2].index(reflected)]
+    c2 = ALPHABET[rotors[1].index(c3)]
+    c1 = ALPHABET[rotors[0].index(c2)]
+    return c1
+
+
+cipher, counter = "", 1
+for char in cleand_plain_txt:
+    cipher += code_plain_txt(char)
+    rotate_rotors(counter)
+    counter += 1
+
+cipher += "\n"
+write_cipher(cipher)
+
+print('your cipher in \'data/cipher.txt\'\nDone!!')
