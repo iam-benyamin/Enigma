@@ -6,3 +6,7 @@ venv/
 
 # vim
 .vim
+
+# python cache files 
+__pycache__/
+*.pyc
