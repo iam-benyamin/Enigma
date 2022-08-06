@@ -7,6 +7,10 @@ venv/
 # vim
 .vim
 
-# python cache files 
+# python cache files
 __pycache__/
 *.pyc
+
+
+# egg files
+Enigma.egg-info/
