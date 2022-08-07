@@ -6,15 +6,20 @@ write cipher text to data/cipher.txt file
 
 import sys
 
-from enigma.reflector import reflector
 from enigma import ALPHABET
+from enigma.plugboard import plugboard
+from enigma.reflector import reflector
 
 
-rotors: list[str] = []
-with open('data/rotors.enigma', 'r', encoding='UTF-8') as rotors_file:
-    rotors = rotors_file.readlines()
-    del rotors_file
-    rotors = [r.strip() for r in rotors]
+try:
+    rotors: list[str] = []
+    with open('data/rotors.enigma', 'r', encoding='UTF-8') as rotors_file:
+        rotors = rotors_file.readlines()
+        del rotors_file
+        rotors = [r.strip() for r in rotors]
+except FileNotFoundError:
+    print('You have to create \'data/rotors.enigma\' file!')
+    sys.exit()
 
 
 def set_rotors(rotors_list: list[str], selected_rotors: list[int], shift: list[int]) -> list[str]:
@@ -48,9 +53,13 @@ def rotate_rotors(shift_counter: int) -> None:
         rotors[2] = rotors[2][1:] + rotors[2][:1]
 
 
-with open('data/plain.txt', 'r', encoding='UTF-8') as plain_file:
-    plain_txt = plain_file.read()
-    del plain_file
+try:
+    with open('data/plain.txt', 'r', encoding='UTF-8') as plain_file:
+        plain_txt = plain_file.read()
+        del plain_file
+except FileNotFoundError:
+    print('You have to create \'data/plain.txt\' file!')
+    sys.exit()
 
 
 def cleaning_plain_txt(plain: str) -> str:
@@ -145,6 +154,8 @@ for c in cleand_plain_txt:
     cipher += code_plain_txt(c)
     rotate_rotors(counter)
     counter += 1
+
+cipher = plugboard(cipher)
 
 cipher += "\n"
 

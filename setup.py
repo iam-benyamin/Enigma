@@ -22,4 +22,3 @@ setup(
     license="MIT",
     packages=find_packages(),
 )
-
