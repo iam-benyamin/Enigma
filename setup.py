@@ -20,5 +20,5 @@ setup(
     author='Benyamin Mahmoudyan, Arthur Scherbius',
     author_email='benyaminmahmoudyan@gmail.com',
     license="MIT",
-    packages=find_packages(),
+    packages=find_packages('src', exclude=['tests']),
 )

@@ -78,7 +78,10 @@ def cleaning_plain_txt(plain: str) -> str:
 cleand_plain_txt = cleaning_plain_txt(plain_txt)
 
 
-def check_user_input_for_rotor(selected_rotor_number: str, r_in_range, is_rotor: bool = False) -> list[int]:
+def check_user_input_for_rotor(
+        selected_rotor_number: str,
+        r_in_range, is_rotor: bool = False
+) -> list[int]:
     ''' get two value
     1. selected_rotor_number: rotor number (which rotor is selected for using in encription)
     2. r_in_range: rotor range (is number between 1 to 26 or 1 to lenght of

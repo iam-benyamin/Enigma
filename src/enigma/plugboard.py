@@ -12,7 +12,7 @@ def switch_generator() -> dict:
     '''
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     switches = {}
-    for i in range(10):
+    for _ in range(10):
         key = random.choice(alphabet)
         value = random.choice(alphabet)
         while value == key:
