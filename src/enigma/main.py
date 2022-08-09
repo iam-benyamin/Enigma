@@ -11,15 +11,20 @@ from enigma.plugboard import plugboard
 from enigma.reflector import reflector
 
 
-try:
+def read_rotors() -> list[str]:
+    '''
+    this function read rotors from file rotors.enigma and return list[str]
+    '''
     rotors: list[str] = []
-    with open('data/rotors.enigma', 'r', encoding='UTF-8') as rotors_file:
-        rotors = rotors_file.readlines()
-        del rotors_file
-        rotors = [r.strip() for r in rotors]
-except FileNotFoundError:
-    print('You have to create \'data/rotors.enigma\' file!')
-    sys.exit()
+    try:
+        with open('data/rotors.enigma', 'r', encoding='UTF-8') as rotors_file:
+            rotors = rotors_file.readlines()
+            del rotors_file
+            rotors = [r.strip() for r in rotors]
+    except FileNotFoundError:
+        print('You have to create \'data/rotors.enigma\' file!')
+        sys.exit()
+    return rotors
 
 
 def set_rotors(rotors_list: list[str], selected_rotors: list[int], shift: list[int]) -> list[str]:
@@ -36,30 +41,33 @@ def set_rotors(rotors_list: list[str], selected_rotors: list[int], shift: list[i
         rotors_list[selected_rotors[2] - 1],
     ]
 
-    for index, item in enumerate(rotors):
-        rotors[index] = item[shift[0]:] + item[:shift[0]]
+    for index, item in enumerate(rotors_list):
+        rotors_list[index] = item[shift[0]:] + item[:shift[0]]
 
     return rotors_list
 
 
-def rotate_rotors(shift_counter: int) -> None:
+def rotate_rotors(rotors_list: list[str], shift_counter: int) -> None:
     ''' Every time we encode a word, the first rotor shifts a word, every
     26 times the second rotor shifts a word, and the third rotor finds a
     shift word every 26 * 26 times. '''
-    rotors[0] = rotors[0][1:] + rotors[0][:1]
+    rotors_list[0] = rotors_list[0][1:] + rotors_list[0][:1]
     if shift_counter % 26:
-        rotors[1] = rotors[1][1:] + rotors[1][:1]
+        rotors_list[1] = rotors_list[1][1:] + rotors_list[1][:1]
     if shift_counter % 676:
-        rotors[2] = rotors[2][1:] + rotors[2][:1]
+        rotors_list[2] = rotors_list[2][1:] + rotors_list[2][:1]
 
 
-try:
-    with open('data/plain.txt', 'r', encoding='UTF-8') as plain_file:
-        plain_txt = plain_file.read()
-        del plain_file
-except FileNotFoundError:
-    print('You have to create \'data/plain.txt\' file!')
-    sys.exit()
+def read_plain_text() -> str:
+    ''' read plain text from file data/plain.txt '''
+    try:
+        with open('data/plain.txt', 'r', encoding='UTF-8') as plain_file:
+            plain = plain_file.read()
+            del plain_file
+    except FileNotFoundError:
+        print('You have to create \'data/plain.txt\' file!')
+        sys.exit()
+    return plain
 
 
 def cleaning_plain_txt(plain: str) -> str:
@@ -73,9 +81,6 @@ def cleaning_plain_txt(plain: str) -> str:
     print('jast lowercase english alphbet are accepted and other characters'
           ' is removed!')
     return cleand_plain
-
-
-cleand_plain_txt = cleaning_plain_txt(plain_txt)
 
 
 def check_user_input_for_rotor(
@@ -122,45 +127,33 @@ def check_user_input_for_rotor(
     return selected_rotor_number
 
 
-try:
-    rotors_number = input(f"Enter 3 number for rotors (1 to {len(rotors)}): ")
-    rotors_number = check_user_input_for_rotor(
-        rotors_number,
-        len(rotors),
-        True
-    )
+def read_rotors_status(rotors):
+    try:
+        rotors_number = input(
+            f"Enter 3 number for rotors (1 to {len(rotors)}): ")
+        rotors_number = check_user_input_for_rotor(
+            rotors_number,
+            len(rotors),
+            True
+        )
+        rotors_shift = input(
+            'Enter your rotor shift (3 number between 1, 26): ')
+        rotors_shift = check_user_input_for_rotor(rotors_shift, 26)
+    except ValueError:
+        sys.exit(0)
+    return rotors_number, rotors_shift
 
-    rotors_shift = input('Enter your rotor shift (3 number between 1, 26): ')
-    rotors_shift = check_user_input_for_rotor(rotors_shift, 26)
 
-except ValueError:
-    sys.exit(0)
-
-
-rotors = set_rotors(rotors, rotors_number, rotors_shift)
-
-
-def code_plain_txt(char: str) -> str:
+def code_plain_txt(rotors_list: list[str], char: str) -> str:
     """ It takes a word from routers and reflectors """
-    c_1 = rotors[0][ALPHABET.index(char)]
-    c_2 = rotors[1][ALPHABET.index(c_1)]
-    c_3 = rotors[2][ALPHABET.index(c_2)]
+    c_1 = rotors_list[0][ALPHABET.index(char)]
+    c_2 = rotors_list[1][ALPHABET.index(c_1)]
+    c_3 = rotors_list[2][ALPHABET.index(c_2)]
     reflected = reflector(c_3)
-    c_3 = ALPHABET[rotors[2].index(reflected)]
-    c_2 = ALPHABET[rotors[1].index(c_3)]
-    c_1 = ALPHABET[rotors[0].index(c_2)]
+    c_3 = ALPHABET[rotors_list[2].index(reflected)]
+    c_2 = ALPHABET[rotors_list[1].index(c_3)]
+    c_1 = ALPHABET[rotors_list[0].index(c_2)]
     return c_1
-
-
-cipher, counter = "", 1
-for c in cleand_plain_txt:
-    cipher += code_plain_txt(c)
-    rotate_rotors(counter)
-    counter += 1
-
-cipher = plugboard(cipher)
-
-cipher += "\n"
 
 
 def write_cipher(cipher_txt: str) -> None:
@@ -170,5 +163,28 @@ def write_cipher(cipher_txt: str) -> None:
         del cipher_file
 
 
-write_cipher(cipher)
-print('your cipher in \'data/cipher.txt\'\nDone!!')
+def main():
+    ''' run all functions '''
+
+    plain_txt = read_plain_text()
+    cleand_plain_txt = cleaning_plain_txt(plain_txt)
+
+    rotors = read_rotors()
+    rotors_number, rotors_shift = read_rotors_status(rotors)
+    rotors = set_rotors(rotors, rotors_number, rotors_shift)
+
+    cipher, counter = "", 1
+    for c in cleand_plain_txt:
+        cipher += code_plain_txt(rotors, c)
+        rotate_rotors(rotors, counter)
+        counter += 1
+
+    cipher += "\n"
+
+    write_cipher(cipher)
+
+
+if __name__ == '__main__':
+    print('start')
+    main()
+    print('your cipher in \'data/cipher.txt\'\nDone!!')
