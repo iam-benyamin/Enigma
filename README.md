@@ -95,20 +95,13 @@ create rotors
 ```
 make rotor
 ```
+create plugboard switches
+```
+make switch
+```
 
 run app
 ```
 make run
 ```
 
-# TODO
-
-- [ ] can run script with args (--code or --decode, --plain-txt-path, --output-path)
-- [ ] tests
-- [ ] publish package on pypi
-- [ ] github actions for chick tests, and auto deploy on pypi
-- [ ] readme
-- [ ] ask for review
-
-
-<!-- ![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg) -->

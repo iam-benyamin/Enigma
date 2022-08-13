@@ -7,7 +7,7 @@ write cipher text to data/cipher.txt file
 import sys
 
 from enigma import ALPHABET
-from enigma.plugboard import plugboard
+from enigma.plugboard import apply_swiches
 from enigma.reflector import reflector
 
 
@@ -27,7 +27,11 @@ def read_rotors() -> list[str]:
     return rotors
 
 
-def set_rotors(rotors_list: list[str], selected_rotors: list[int], shift: list[int]) -> list[str]:
+def set_rotors(
+        rotors_list: list[str],
+        selected_rotors: list[int],
+        shift: list[int]
+) -> list[str]:
     '''
     rotors is list of rotors which generated with \'app/rotor.py\'
     selected_rotors list of number which told us which rotors we use
@@ -88,7 +92,8 @@ def check_user_input_for_rotor(
         r_in_range, is_rotor: bool = False
 ) -> list[int]:
     ''' get two value
-    1. selected_rotor_number: rotor number (which rotor is selected for using in encription)
+    1. selected_rotor_number: rotor number (which rotor is selected for using
+    in encription)
     2. r_in_range: rotor range (is number between 1 to 26 or 1 to lenght of
     rotors list)
 
@@ -128,6 +133,9 @@ def check_user_input_for_rotor(
 
 
 def read_rotors_status(rotors):
+    '''
+    read rotors status from user input and return list[int]
+    '''
     try:
         rotors_number = input(
             f"Enter 3 number for rotors (1 to {len(rotors)}): ")
@@ -163,6 +171,29 @@ def write_cipher(cipher_txt: str) -> None:
         del cipher_file
 
 
+def coding(plain: str, rotors: list[str]) -> str:
+    cipher, counter = "", 1
+    for c in plain:
+        cipher += code_plain_txt(rotors, c)
+        rotate_rotors(rotors, counter)
+        counter += 1
+    cipher += "\n"
+    return cipher
+
+
+def read_switches_from_file() -> dict:
+    """
+    read the switches from a file
+    """
+    switches_dict = {}
+    with open('data/switches.txt', 'r', encoding='UTF-8') as file:
+        for line in file:
+            key, value = line.split()
+            switches_dict[key] = value
+
+    return switches_dict
+
+
 def main():
     ''' run all functions '''
 
@@ -173,13 +204,19 @@ def main():
     rotors_number, rotors_shift = read_rotors_status(rotors)
     rotors = set_rotors(rotors, rotors_number, rotors_shift)
 
-    cipher, counter = "", 1
-    for c in cleand_plain_txt:
-        cipher += code_plain_txt(rotors, c)
-        rotate_rotors(rotors, counter)
-        counter += 1
+    switches = read_switches_from_file()
+    code_or_dicode = input(
+        'Do you want to code or decode? (code/decode): ').strip()
 
-    cipher += "\n"
+    if code_or_dicode == 'code':
+        cipher = coding(cleand_plain_txt, rotors)
+        cipher = apply_swiches(switches, cipher)
+    elif code_or_dicode == 'decode':
+        cipher = apply_swiches(switches, cleand_plain_txt)
+        cipher = coding(cipher, rotors)
+    else:
+        print('Your input should be code or decode!')
+        sys.exit()
 
     write_cipher(cipher)
 

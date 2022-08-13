@@ -24,5 +24,11 @@ build: ## create vertualenv and install all dependencies
 rotor: ## build rotors and save them to data/rotors.enigma
 	@$(BIN)/python3 src/enigma/rotor.py
 
+switch: ## create switches and save them to data/switches.enigma
+	@$(BIN)/python3 src/enigma/plugboard.py
+
 run: ## run the application
 	@$(BIN)/python3 src/enigma/main.py
+
+all: build rotor switch run ## run all scripts
+	echo "build, rotor, switch, run is done"
