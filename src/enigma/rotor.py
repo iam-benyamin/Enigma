@@ -13,9 +13,9 @@ def rotor_generator(rotors_number: int = 5, text: str = "") -> str:
     """
     assert isinstance(rotors_number, int), 'rotor number should be intger'
     for _ in range(1, rotors_number + 1):
-        rotor = list(ALPHABET)
-        shuffle(rotor)
-        rotor = "".join(rotor)
+        rotor_char_list = list(ALPHABET)
+        shuffle(rotor_char_list)
+        rotor = "".join(rotor_char_list)
         text += f"{rotor}\n"
 
     return text

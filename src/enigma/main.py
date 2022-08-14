@@ -89,7 +89,8 @@ def cleaning_plain_txt(plain: str) -> str:
 
 def check_user_input_for_rotor(
         selected_rotor_number: str,
-        r_in_range, is_rotor: bool = False
+        rotor_range: int,
+        is_rotor: bool = False
 ) -> list[int]:
     ''' get two value
     1. selected_rotor_number: rotor number (which rotor is selected for using
@@ -108,28 +109,28 @@ def check_user_input_for_rotor(
 
     at the end return selected_rotor_number : list[int]
     '''
-    selected_rotor_number = selected_rotor_number.split()
     try:
-        selected_rotor_number = list(map(int, selected_rotor_number))
+        selected_rotor_no_list = list(map(int, selected_rotor_number.split()))
     except ValueError:
         print('Your input should be integer!')
+        sys.exit()
 
-    if len(selected_rotor_number) != 3:
+    if len(selected_rotor_no_list) != 3:
         print('You have to enter 3 number!')
-        raise ValueError()
+        sys.exit()
 
-    if any(int(i) > r_in_range for i in selected_rotor_number):
-        print(f'Your items should be smaller then {r_in_range}!')
-        raise ValueError()
+    if any(int(i) > rotor_range for i in selected_rotor_no_list):
+        print(f'Your items should be smaller then {rotor_range}!')
+        sys.exit()
 
     if is_rotor:
-        if selected_rotor_number[0] == selected_rotor_number[1] or \
-                selected_rotor_number[0] == selected_rotor_number[2] or \
-                selected_rotor_number[1] == selected_rotor_number[2]:
+        if selected_rotor_no_list[0] == selected_rotor_no_list[1] or \
+                selected_rotor_no_list[0] == selected_rotor_no_list[2] or \
+                selected_rotor_no_list[1] == selected_rotor_no_list[2]:
             print('Your input should not be equal!')
-            raise ValueError()
+            sys.exit()
 
-    return selected_rotor_number
+    return selected_rotor_no_list
 
 
 def read_rotors_status(rotors):
@@ -172,9 +173,16 @@ def write_cipher(cipher_txt: str) -> None:
 
 
 def coding(plain: str, rotors: list[str]) -> str:
+    '''
+    :param plain: plain text
+    :param rotors: list of rotors
+    :return: cipher text
+    get plain text and Each word passes it through the rotors and reflectors,
+    and finally it rotates the rotors by one unit.
+    '''
     cipher, counter = "", 1
-    for c in plain:
-        cipher += code_plain_txt(rotors, c)
+    for char in plain:
+        cipher += code_plain_txt(rotors, char)
         rotate_rotors(rotors, counter)
         counter += 1
     cipher += "\n"
