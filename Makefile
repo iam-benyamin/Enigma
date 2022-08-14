@@ -30,5 +30,8 @@ switch: ## create switches and save them to data/switches.enigma
 run: ## run the application
 	@$(BIN)/python3 src/enigma/main.py
 
+test: ## run pytest, mypy, pylint, and flake8
+	tox
+
 all: build rotor switch run ## run all scripts
 	echo "build, rotor, switch, run is done"

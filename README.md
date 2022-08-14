@@ -87,6 +87,9 @@ Enigma was designed to be secure even if the rotor wiring was known to an oppone
 ## by makefile
 
 create virtual enviroment and install dependencies
+
+do all stepes one by one
+
 ```
 make build
 ```
@@ -105,3 +108,25 @@ run app
 make run
 ```
 
+do all steps together
+```
+make all
+```
+
+These commands are only for the first time and for the next times you only need
+to type the following command
+```
+make run
+```
+
+# Testing
+
+for test this code run below command in root dirctory
+
+```
+tox
+```
+or run
+```
+make test
+```
